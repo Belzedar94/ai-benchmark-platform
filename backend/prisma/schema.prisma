@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Benchmark {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  description        String
+  category          Category @relation(fields: [categoryId], references: [id])
+  categoryId        Int
+  linkToPaper       String?
+  methodologyOverview String
+  humanBaseline     Float?
+  scores            Score[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Model {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      ModelType @relation(fields: [typeId], references: [id])
+  typeId    Int
+  scores    Score[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Score {
+  id          Int       @id @default(autoincrement())
+  benchmark   Benchmark @relation(fields: [benchmarkId], references: [id])
+  benchmarkId Int
+  model       Model     @relation(fields: [modelId], references: [id])
+  modelId     Int
+  score       Float
+  lastUpdated DateTime  @default(now())
+}
+
+model Category {
+  id         Int         @id @default(autoincrement())
+  name       String
+  benchmarks Benchmark[]
+}
+
+model ModelType {
+  id     Int     @id @default(autoincrement())
+  name   String
+  models Model[]
+}
